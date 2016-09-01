@@ -1,0 +1,117 @@
+﻿<!doctype html>
+<html>
+<head>
+    <title>Kauppalista 1.1</title>
+	<meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width">
+	<meta charset="utf-8">
+	<link rel="icon" sizes="128x128" href="kl128.png">
+	<link rel="stylesheet" href="jqm142/jquery.mobile-1.4.2.min.css" />
+</head>
+<body>
+    <div id="main" data-role="page">
+		<header data-role ="header" data-theme="b"> 
+		  <h1 class="ui-title" role="heading">Kauppalista</h1>
+			<div class="ui-btn-right" data-role="controlgroup" data-type="horizontal">
+				<a href="#confirm" data-role="button" data-rel="dialog">Uusi</a>
+				<!-- Test function to add data rapidly. Commented out in final version.
+				<a href="#" data-role="button" onclick="addTestItems(this.form)">Testaa</a> -->
+				<a href="#allItemsInfo" data-role="button" data-rel="dialog" onclick="viewItemsInUI()">Asetukset</a>
+				<a href="#help" data-role="button" data-rel="dialog">Ohjeet</a>
+				<a href="#about" data-role="button" data-rel="dialog">Tietoja</a>
+			</div>
+		</header>
+
+		<div id="collapse" data-role="collapsible">
+			<h3>Toiminnot</h3>
+			<div id="basicActions" data-role="content" >
+				<form id="addItemForm" class="form-inline">Ostos
+					<input id="nameInput" type="text" name="itemName" size="10">
+					<ul id="suggestions" data-role="listview" data-inset="true"></ul>
+					<input type="button" value="Lisää ostos" onclick="addItemViaUi(this.form)" class="btn btn-small">
+					<select id="amountInput" name="itemAmount">
+						<option>1</option>
+						<option> </option>
+						<option>2</option>
+						<option>3</option>
+						<option>4</option>
+						<option>5</option>
+						<option>6</option>
+						<option>7</option>
+						<option>8</option>
+						<option>9</option>
+						<option>10</option>
+					</select>
+				</form>
+			</div>
+		</div>
+		
+		<div id="itemListDiv">
+			<h4>Nouki</h4>
+			<ul data-role="listview" id="ulNonPicked" data-inset="true"></ul>
+		</div>
+		<div id="itemPurchasedDiv">
+			<h4>Löydetyt</h4>
+			<ul data-role="listview" id="ulPicked"  data-inset="true"></ul>
+		</div>
+
+	</div>
+	
+	<!-- Modal Help dialog -->
+	<div id="help" data-role="page" data-close-btn="right">
+		<div data-role="header" data-close-btn="right">
+			<h3>Ohjeet</h3>
+		</div>
+		<div data-role="content">
+			<p>Tee kauppalista kirjaamalla haluamasi ostokset ja määrät.</p>
+			<p>Lista säilyy tallessa vaikka poistut sovelluksesta välillä.</p>
+			<p>Kaikki tekemäsi ostokset tallentuvat ja ostosta näppäiltäessä ehdotetaan samat kirjaimet sisältäviä ostoksia. Valitse tällöin haluamasi ostos esille pompahtavasta listasta tai jatka kirjoittamista.</p>
+			<p>Merkitse ostos noukituksi klikkaamalla sitä. Tällöin ostos siirtyy alemmalle Löydetyt listalle. Voit palauttaa ostoksen Nouki listalle klikkaamalla taas.</p>
+			<p>Aloita uusi lista klikkaamalla <b>Uusi</b>. Sinulta kysytään varmistus ennen kuin entinen lista poistetaan.</p>
+			<p>Voit muokata tallennettujen ostostyyppien tietoja klikkaamalla <b>Asetukset</b>.</p>
+		</div>
+	</div>
+	
+	<!-- Modal About box-->
+	<div id="about" data-role="page" data-close-btn="right">
+		<div data-role="header" data-close-btn="right">
+			<h3>Kauppalista 1.1</h3>
+		</div>
+		<div data-role="content">
+			<p>HTML5 mobiilisovellukset kurssin harjoitustyö. (C) Harri Kyllönen 2013-2014</p>
+			<p>Käyttöliittymä tehty käyttäen jQuery Mobile:a.</p>
+		</div>
+	</div>
+	
+	<!-- Modal confirm dialog -->
+	<div id="confirm" data-role="page" data-close-btn="right">
+		<div data-role="header" data-close-btn="right">
+			<h3>Ostosten poisto</h3>
+		</div>
+		<div data-role="content">
+			<p>Voiko poistaa kaikki ostokset?</p>
+			<a href="#main" data-role="button" data-rel="back">Ei</a>
+			<a href="#main" data-role="button" onclick="clearGroceryList()">Kyllä</a>
+		</div>
+	</div>
+	
+	<!-- Modal List Items view box-->
+	<div id="allItemsInfo" data-role="page" data-close-btn="right">
+		<div data-role="header" data-close-btn="right">
+			<h3>Kaikki kirjatut ostokset</h3>
+		</div>
+		<div data-role="content">
+			<a href="#main" data-role="button" onclick="clearListItems()">Poista kaikki</a>
+			<p>Jos klikkaat riviä, niin se poistetaan ilman varmistuksia.</p>
+			<h4>Ostoksen nimi ja esiintymiä yhteensä</h4>
+			<ul id="allItems" data-role="listview"></ul>
+		</div>
+	</div>
+	
+	<script src="js/underscore-min.js"></script>
+	<script src="js/jquery.js"></script>
+	<script src="js/jqm.autoComplete-1.5.1-min.js"></script>
+	<script src="jqm142/jquery.mobile-1.4.2.min.js"></script>
+	<script src="js/main_jqm.js"></script>
+</body>
+</html>
