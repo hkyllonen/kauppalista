@@ -13,84 +13,73 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// Haetaan listan tunnus URL-parametrilla (esim. index.html?lista=perhe1)
-// Jos parametria ei ole, oletus on 'yleinen'
+// Haetaan listan tunnus URL:sta (esim. kauppalista.html?lista=perhe)
 const urlParams = new URLSearchParams(window.location.search);
 const listaId = urlParams.get('lista') || 'yleinen';
 const listaRef = db.ref('kauppalista/' + listaId);
 
 var lista = [];
 
-// JQM init - kun sivu on valmis
-$(document).on("pageinit", "#paasivu", function() {
+// jQuery Mobile sivun alustus
+$(document).on("pagecreate", "#paasivu", function() {
     
-    // --- REAALIAIKAINEN SYNKRONOINTI ---
-    // Tämä korvaa vanhan lataa()-kutsun. 
-    // Kun data muuttuu pilvessä, tämä suoritetaan automaattisesti kaikilla laitteilla.
+    // REAALIAIKAINEN SYNKRONOINTI PILVESTÄ
     listaRef.on('value', function(snapshot) {
         var data = snapshot.val();
         lista = data ? data : [];
-        piirraLista(); // Päivittää käyttöliittymän
+        piirraLista();
     });
 
-    // Tuotteen lisäysnappi
-    $('#lisaa-nappi').on('click', function() {
-        var tuote = $('#uusi-tuote').val();
-        if (tuote) {
-            lisaaTuote(tuote);
-            $('#uusi-tuote').val(""); // Tyhjennetään kenttä
+    // LISÄÄ-NAPPI (ID: #nappi HTML-tiedostossasi)
+    $('#nappi').on('click', function() {
+        var tuoteNimi = $('#uusi-tuote').val();
+        if (tuoteNimi.trim() !== "") {
+            lista.push({ nimi: tuoteNimi, ostettu: false });
+            tallenna();
+            $('#uusi-tuote').val("");
+        }
+    });
+
+    // TAPAHTUMIEN DELEGOINTI: Klikkaukset listalla
+    // Käytetään delegointia, koska lista tyhjennetään ja piirretään uusiksi joka muutoksessa
+    $('#kauppalista').on('click', 'li a', function(e) {
+        var index = $(this).closest('li').index();
+        
+        // Jos klikattiin poisto-nappia (JQM:n split-button-ikoniosa)
+        if ($(this).hasClass('ui-li-link-alt')) {
+            lista.splice(index, 1);
+            tallenna();
+        } else {
+            // Klikattiin itse tuotetta -> muuta tila
+            if(lista[index]) {
+                lista[index].ostettu = !lista[index].ostettu;
+                tallenna();
+            }
         }
     });
 });
 
-// Tallennus pilveen
 function tallenna() {
     listaRef.set(lista);
 }
 
-function lisaaTuote(tuoteNimi) {
-    var uusiTuote = {
-        nimi: tuoteNimi,
-        ostettu: false
-    };
-    lista.push(uusiTuote);
-    tallenna();
-}
-
-function poistaTuote(index) {
-    lista.splice(index, 1);
-    tallenna();
-}
-
-function muutaTila(index) {
-    lista[index].ostettu = !lista[index].ostettu;
-    tallenna();
-}
-
-// Käyttöliittymän piirtäminen
 function piirraLista() {
     var $listaUl = $('#kauppalista');
-    $listaUl.empty(); // Tyhjennetään nykyinen lista
+    $listaUl.empty();
 
     $.each(lista, function(index, tuote) {
-        var tyyli = tuote.ostettu ? 'style="text-decoration: line-through; color: gray;"' : '';
+        var tyyli = tuote.ostettu ? 'style="text-decoration: line-through; opacity: 0.5;"' : '';
         
-        var li = $('<li><a href="#" ' + tyyli + '>' + tuote.nimi + '</a>' +
-                   '<a href="#" class="poista" data-index="' + index + '">Poista</a></li>');
+        // Rakennetaan JQM-yhteensopiva split-button lista-alkio
+        var li = '<li>' +
+                 '<a href="#" ' + tyyli + '>' + tuote.nimi + '</a>' +
+                 '<a href="#">Poista</a>' +
+                 '</li>';
         
-        // Merkataan ostetuksi klikkaamalla tekstiä
-        li.find('a').first().on('click', function() {
-            muutaTila(index);
-        });
-
-        // Poistetaan tuote
-        li.find('.poista').on('click', function() {
-            poistaTuote(index);
-        });
-
         $listaUl.append(li);
     });
 
-    // Tärkeää jQuery Mobilelle: päivitetään listan ulkoasu
+    // Virkistetään jQuery Mobilen lista-ulkoasu
     $listaUl.listview('refresh');
 }
+
